@@ -38,6 +38,13 @@ int main(void)
 	init_tasks();
 
 	char *input = (char *)malloc(MAX_COMMAND_LEN);
+	int **relations = malloc(MAX_PEOPLE * sizeof(int *));
+	for (int i = 0; i < MAX_PEOPLE; i++) {
+		relations[i] = malloc(MAX_PEOPLE * sizeof(int));
+		for (int j = 0; j < MAX_PEOPLE; j++) {
+			relations[i][j] = 0;
+		}
+	}
 	while (1) {
 		input = fgets(input, MAX_COMMAND_LEN, stdin);
 
@@ -46,7 +53,7 @@ int main(void)
 			break;
 
 		#ifdef TASK_1
-		handle_input_friends(input);
+		handle_input_friends(input, &relations);
 		#endif
 
 		#ifdef TASK_2
@@ -57,6 +64,10 @@ int main(void)
 		handle_input_feed(input);
 		#endif
 	}
-
+	for (int i = 0; i < MAX_PEOPLE; i++) {
+		free(relations[i]);
+	}
+	free(relations);
+	free(input);
 	return 0;
 }
