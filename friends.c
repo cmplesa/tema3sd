@@ -7,8 +7,8 @@
 
 void add_friend(int ***relations, char *user1, char *user2)
 {
-	int id1 = (int)get_user_id(user1);
-	int id2 = (int)get_user_id(user2);
+	int id1 = get_user_id(user1);
+	int id2 = get_user_id(user2);
 	(*relations)[id1][id2] = 1;
 	(*relations)[id2][id1] = 1;
 	printf("Added connection %s - %s\n", user1, user2);
@@ -16,8 +16,8 @@ void add_friend(int ***relations, char *user1, char *user2)
 
 void remove_friend(int ***relations, char *user1, char *user2)
 {
-	int id1 = (int)get_user_id(user1);
-	int id2 = (int)get_user_id(user2);
+	int id1 = get_user_id(user1);
+	int id2 = get_user_id(user2);
 	(*relations)[id1][id2] = 0;
 	(*relations)[id2][id1] = 0;
 	printf("Removed connection %s - %s\n", user1, user2);
@@ -27,7 +27,6 @@ void sort_names(char ***names, int names_number)
 {
 	for (int i = 0; i < names_number - 1; i++) {
 		for (int j = i + 1; j < names_number; j++) {
-			//if (strcmp((*names)[i], (*names)[j]) > 0) {
 			if (get_user_id((*names)[i]) > get_user_id((*names)[j])) {
 				char *temp = (*names)[i];
 				(*names)[i] = (*names)[j];
@@ -51,7 +50,7 @@ void uniqe_names(char ***names, int *names_number)
 
 void print_suggestions(int **relations, char *user)
 {
-	int id = (int)get_user_id(user);
+	int id = get_user_id(user);
 	char **suggestions = malloc(MAX_PEOPLE * sizeof(char *));
 	int suggestions_number = 0;
 	for (int i = 0; i < MAX_PEOPLE; i++) {
@@ -79,32 +78,31 @@ void print_suggestions(int **relations, char *user)
 
 void print_distance(int **relations, char *user1, char *user2) // BFS
 {
-	int id1 = (int)get_user_id(user1);
-	int id2 = (int)get_user_id(user2);
+	int id1 = get_user_id(user1);
+	int id2 = get_user_id(user2);
 	if (id1 == id2) {
 		printf("0\n");
 		return;
 	}
 	int *visited = calloc(MAX_PEOPLE, sizeof(int));
-	int *queue = malloc(MAX_PEOPLE * sizeof(int));
-	int *distance = calloc(MAX_PEOPLE, sizeof(int)); // sa-l fac inf?
+	int *q = malloc(MAX_PEOPLE * sizeof(int));
+	int *dist = calloc(MAX_PEOPLE, sizeof(int)); // sa-l fac inf?
 	int print_idx = 0;
 	int write_idx = 0;
-	queue[write_idx] = id1;
+	q[write_idx] = id1;
 	visited[id1] = 1;
 	while (print_idx <= write_idx) {
-		int curr = queue[print_idx];
-		print_idx++;
+		int curr = q[print_idx++];
 		for (int i = 0; i < MAX_PEOPLE; i++) {
 			if (relations[curr][i] == 1 && visited[i] == 0) {
-				queue[++write_idx] = i;
+				q[++write_idx] = i;
 				visited[i] = 1;
-				distance[i] = distance[curr] + 1;
+				dist[i] = dist[curr] + 1;
 				if (i == id2) {
-					printf("The distance between %s - %s is %d\n", user1, user2, distance[i]);
+					printf("The distance between %s - %s is %d\n", user1, user2, dist[i]);
 					free(visited);
-					free(queue);
-					free(distance);
+					free(q);
+					free(dist);
 					return;
 				}
 			}
@@ -112,14 +110,14 @@ void print_distance(int **relations, char *user1, char *user2) // BFS
 	}
 	printf("There is no way to get from %s to %s\n", user1, user2);
 	free(visited);
-	free(queue);
-	free(distance);
+	free(q);
+	free(dist);
 }
 
 void print_common_friends(int **relations, char *user1, char *user2)
 {
-	int id1 = (int)get_user_id(user1);
-	int id2 = (int)get_user_id(user2);
+	int id1 = get_user_id(user1);
+	int id2 = get_user_id(user2);
 	char **common_friends = malloc(MAX_PEOPLE * sizeof(char *));
 	int common_number = 0;
 	for (int i = 0; i < MAX_PEOPLE; i++) {
@@ -143,7 +141,7 @@ void print_common_friends(int **relations, char *user1, char *user2)
 
 void print_friends(int **relations, char *user)
 {
-	int id = (int)get_user_id(user);
+	int id = get_user_id(user);
 	int friends_number = 0;
 	for (int i = 0; i < MAX_PEOPLE; i++) {
 		if (relations[id][i] == 1) {
@@ -155,7 +153,7 @@ void print_friends(int **relations, char *user)
 
 void print_popular(int **relations, char *user)
 {
-	int id = (int)get_user_id(user);
+	int id = get_user_id(user);
 	int max_friends = 0;
 	int popular_id = 0;
 	int user_friends_nr = 0;
