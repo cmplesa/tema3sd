@@ -123,7 +123,18 @@ post_array ***create_post(post_array ***tree_of_posts, char *name, char *title, 
 	(*num_posts)++;
 	(*(*tree_of_posts))->number_of_posts = (*num_posts);
 	int number_of_posts = (*(*tree_of_posts))->number_of_posts;
-	post_tree **bigger_tree = realloc(*tree_of_posts,(number_of_posts) * sizeof(post_tree *));
+	post_tree **bigger_tree = realloc((*tree_of_posts)->posts,(number_of_posts) * sizeof(post_tree *));// aici nu face make si imi da urm eroare
+	/*
+		posts.c:126:59: error: request for member ‘posts’ in something not a structure or union
+  126 |         post_tree **bigger_tree = realloc((*tree_of_posts).posts,(number_of_posts) * sizeof(post_tree *));
+      |                                                           ^
+posts.c:128:25: error: ‘**tree_of_posts’ is a pointer; did you mean to use ‘->’?
+  128 |         (*tree_of_posts)->posts = bigger_tree;
+      |                         ^~
+      |                         ->
+make: *** [<builtin>: posts.o] Error 1
+ 
+	*/
 	DIE(bigger_tree == NULL, "bigger_tree malloc");
 	(*tree_of_posts)->posts = bigger_tree;
 	(*(*tree_of_posts))->posts[(*num_posts)  - 1] = create_post_tree(sizeof(node_posts));
