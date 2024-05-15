@@ -84,7 +84,7 @@ node_posts *create_post_node(char *name, char *title, int post_id, int repost_ac
 		new_post->likes = 0;
 		new_post->user_id = get_user_id(name);
 		new_post->title = malloc(sizeof(strlen(title) + 1));
-		memcpy(new_post->title, title, strlen(title) + 1);
+		strcpy(new_post->title, title);
 		new_post->parent_id = parent_id;
 		new_post->post_id = post_id;
 		new_post->children = malloc(MAX_POSTS * sizeof(node_posts *));
@@ -118,28 +118,17 @@ post_tree *create_post_tree(size_t data_size)
 	return new_tree;
 }
 
-post_array ***create_post(post_array ***tree_of_posts, char *name, char *title, int *num_posts)
+post_array **create_post(post_array **tree_of_posts, char *name, char *title, int *num_posts)
 {	
 	(*num_posts)++;
-	(*(*tree_of_posts))->number_of_posts = (*num_posts);
-	int number_of_posts = (*(*tree_of_posts))->number_of_posts;
-	post_tree **bigger_tree = realloc((*tree_of_posts)->posts,(number_of_posts) * sizeof(post_tree *));// aici nu face make si imi da urm eroare
-	/*
-		posts.c:126:59: error: request for member ‘posts’ in something not a structure or union
-  126 |         post_tree **bigger_tree = realloc((*tree_of_posts).posts,(number_of_posts) * sizeof(post_tree *));
-      |                                                           ^
-posts.c:128:25: error: ‘**tree_of_posts’ is a pointer; did you mean to use ‘->’?
-  128 |         (*tree_of_posts)->posts = bigger_tree;
-      |                         ^~
-      |                         ->
-make: *** [<builtin>: posts.o] Error 1
- 
-	*/
+	(*tree_of_posts)->number_of_posts = (*num_posts);
+	int number_of_posts = (*tree_of_posts)->number_of_posts;
+	post_tree **bigger_tree = realloc((*tree_of_posts)->posts,(number_of_posts) * sizeof(post_tree *));
 	DIE(bigger_tree == NULL, "bigger_tree malloc");
 	(*tree_of_posts)->posts = bigger_tree;
-	(*(*tree_of_posts))->posts[(*num_posts)  - 1] = create_post_tree(sizeof(node_posts));
-	(*(*tree_of_posts))->posts[(*num_posts) - 1]->root = create_post_node(name, title, number_of_posts, 0, -1);
-	printf("< Created \"%s\" for %d\n", (*(*tree_of_posts))->posts[0]->root->title, (*(*tree_of_posts))->posts[0]->root->user_id);
+	(*tree_of_posts)->posts[(*num_posts)  - 1] = create_post_tree(sizeof(node_posts));
+	(*tree_of_posts)->posts[(*num_posts) - 1]->root = create_post_node(name, title, number_of_posts, 0, -1);
+	printf("< Created \"%s\" for %d\n", (*tree_of_posts)->posts[0]->root->title, (*tree_of_posts)->posts[0]->root->user_id);
 
 	
 	
@@ -207,7 +196,7 @@ void get_likes_post(int post_id)
 	printf("< Likes for post %d: 1\n", post_id);
 }
 
-void handle_input_posts(char *input, post_array ***post_array)
+void handle_input_posts(char *input, post_array **post_array)
 {
 	char *commands = strdup(input);
 	char *cmd = strtok(commands, "\n ");
