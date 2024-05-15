@@ -45,6 +45,16 @@ int main(void)
 			relations[i][j] = 0;
 		}
 	}
+	post_array *posts = malloc(sizeof(post_array));
+	DIE(posts == NULL, "posts malloc");
+	posts->number_of_posts = 0;
+	posts->posts = malloc(5 * sizeof(post_tree *));
+	for(int i = 0; i < 5; i++) {
+		posts->posts[i] = malloc(sizeof(post_tree));
+		posts->posts[i]->root = NULL;
+		posts->posts[i]->number_of_reposts = 0;
+	}
+	// (*posts)->root = NULL;
 	while (1) {
 		input = fgets(input, MAX_COMMAND_LEN, stdin);
 
@@ -57,7 +67,7 @@ int main(void)
 		#endif
 
 		#ifdef TASK_2
-		handle_input_posts(input);
+		handle_input_posts(input, &posts);
 		#endif
 
 		#ifdef TASK_3
