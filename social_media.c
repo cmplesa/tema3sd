@@ -16,11 +16,25 @@
 void init_tasks(void)
 {
 	#ifdef TASK_1
-
+	int **relations = malloc(MAX_PEOPLE * sizeof(int *));
+	for (int i = 0; i < MAX_PEOPLE; i++) {
+		relations[i] = malloc(MAX_PEOPLE * sizeof(int));
+		for (int j = 0; j < MAX_PEOPLE; j++) {
+			relations[i][j] = 0;
+		}
+	}
 	#endif
 
 	#ifdef TASK_2
-
+	post_array *posts = malloc(sizeof(post_array));
+	
+	posts->number_of_posts = 0;
+	posts->posts = malloc(5 * sizeof(post_tree *));
+	for(int i = 0; i < 5; i++) {
+		posts->posts[i] = malloc(sizeof(post_tree));
+		posts->posts[i]->root = NULL;
+		posts->posts[i]->number_of_reposts = 0;
+	}
 	#endif
 
 	#ifdef TASK_3
@@ -38,22 +52,7 @@ int main(void)
 	init_tasks();
 
 	char *input = (char *)malloc(MAX_COMMAND_LEN);
-	int **relations = malloc(MAX_PEOPLE * sizeof(int *));
-	for (int i = 0; i < MAX_PEOPLE; i++) {
-		relations[i] = malloc(MAX_PEOPLE * sizeof(int));
-		for (int j = 0; j < MAX_PEOPLE; j++) {
-			relations[i][j] = 0;
-		}
-	}
-	post_array *posts = malloc(sizeof(post_array));
-	DIE(posts == NULL, "posts malloc");
-	posts->number_of_posts = 0;
-	posts->posts = malloc(5 * sizeof(post_tree *));
-	for(int i = 0; i < 5; i++) {
-		posts->posts[i] = malloc(sizeof(post_tree));
-		posts->posts[i]->root = NULL;
-		posts->posts[i]->number_of_reposts = 0;
-	}
+
 	// (*posts)->root = NULL;
 	while (1) {
 		input = fgets(input, MAX_COMMAND_LEN, stdin);
@@ -63,10 +62,31 @@ int main(void)
 			break;
 
 		#ifdef TASK_1
+		int **relations = malloc(MAX_PEOPLE * sizeof(int *));
+		for (int i = 0; i < MAX_PEOPLE; i++) {
+		relations[i] = malloc(MAX_PEOPLE * sizeof(int));
+		for (int j = 0; j < MAX_PEOPLE; j++) {
+			relations[i][j] = 0;
+		}
+		}
 		handle_input_friends(input, &relations);
+		for (int i = 0; i < MAX_PEOPLE; i++) {
+		free(relations[i]);
+		}
+		free(relations);
+		free(input);
 		#endif
 
 		#ifdef TASK_2
+		post_array *posts = malloc(sizeof(post_array));
+	
+		posts->number_of_posts = 0;
+		posts->posts = malloc(5 * sizeof(post_tree *));
+		for(int i = 0; i < 5; i++) {
+		posts->posts[i] = malloc(sizeof(post_tree));
+		posts->posts[i]->root = NULL;
+		posts->posts[i]->number_of_reposts = 0;
+		}
 		handle_input_posts(input, &posts);
 		#endif
 
@@ -74,10 +94,5 @@ int main(void)
 		handle_input_feed(input);
 		#endif
 	}
-	for (int i = 0; i < MAX_PEOPLE; i++) {
-		free(relations[i]);
-	}
-	free(relations);
-	free(input);
 	return 0;
 }
