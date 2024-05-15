@@ -35,6 +35,6 @@ struct post_array {
 };
 
 
-void handle_input_posts(char *input, post_array ***posts);
+void handle_input_posts(char *input, post_array **posts);
 
 #endif // POSTS_H
