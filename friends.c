@@ -27,11 +27,24 @@ void sort_names(char ***names, int names_number)
 {
 	for (int i = 0; i < names_number - 1; i++) {
 		for (int j = i + 1; j < names_number; j++) {
-			if (strcmp((*names)[i], (*names)[j]) > 0) {
+			//if (strcmp((*names)[i], (*names)[j]) > 0) {
+			if (get_user_id((*names)[i]) > get_user_id((*names)[j])) {
 				char *temp = (*names)[i];
 				(*names)[i] = (*names)[j];
 				(*names)[j] = temp;
 			}
+		}
+	}
+}
+
+void uniqe_names(char ***names, int *names_number)
+{
+	for (int i = 0; i < (*names_number) - 1; i++) {
+		while (strcmp((*names)[i], (*names)[i + 1]) == 0 && i != (*names_number - 1)) { // daca se repeta se shifteaza toti o poz la stanga
+			for (int j = i; j < (*names_number) - 1; j++) {
+				(*names)[j] = (*names)[j + 1];
+			}
+			(*names_number)--;
 		}
 	}
 }
@@ -53,6 +66,7 @@ void print_suggestions(int **relations, char *user)
 	}
 	if (suggestions_number) {
 		sort_names(&suggestions, suggestions_number);
+		uniqe_names(&suggestions, &suggestions_number);
 		printf("Suggestions for %s:\n", user);
 		for (int i = 0; i < suggestions_number; i++) {
 			printf("%s\n", suggestions[i]);
@@ -115,6 +129,7 @@ void print_common_friends(int **relations, char *user1, char *user2)
 		}
 	}
 	sort_names(&common_friends, common_number);
+	uniqe_names(&common_friends, &common_number);
 	if (common_number) {
 		printf("The common friends between %s and %s are:\n", user1, user2);
 		for (int i = 0; i < common_number; i++) {
