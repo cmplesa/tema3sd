@@ -11,12 +11,13 @@ typedef struct node_posts_t node_posts_t;
 struct  node_posts_t {
 	
 	node_posts_t **children;
-    int parent_id;
+	int parent_id;
 	/* data contained by the node */
 	int likes;
-    uint16_t user_id;
-    char *title;
-    int post_id;
+	uint16_t user_id;
+	char *title;
+	int post_id;
+	int children_number;
 };
 
 typedef struct post_tree_t post_tree_t;
@@ -32,6 +33,7 @@ typedef struct post_array_t post_array_t;
 struct post_array_t {
 	post_tree_t **posts;
 	int number_of_posts;
+	int total_posts;
 };
 
 
