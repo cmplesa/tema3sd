@@ -19,56 +19,56 @@
 		}							\
 	} while (0)
 
-node_posts *create_post_node(char *name, char *title, int post_id, int repost_activity, int parent_id)
+node_posts_t *create_post_node(char *name, char *title, int post_id, int repost_activity, int parent_id)
 {	
 	if (repost_activity == 0) {
-		node_posts *new_post = (node_posts *)malloc(sizeof(node_posts));
+		node_posts_t *new_post = (node_posts_t *)malloc(sizeof(node_posts_t));
 		DIE(new_post == NULL, "new_node malloc");
 		new_post->likes = 0;
 		new_post->user_id = get_user_id(name);
 		new_post->title = strdup(title);
 		new_post->parent_id = parent_id;
 		new_post->post_id = post_id;
-		new_post->children = malloc(MAX_POSTS * sizeof(node_posts *));
+		new_post->children = malloc(MAX_POSTS * sizeof(node_posts_t *));
 		DIE(new_post->children == NULL, "new_node->children malloc");
 		for(int i = 0; i < MAX_POSTS; i++) {
-			new_post->children[i] = malloc(sizeof(node_posts));
+			new_post->children[i] = malloc(sizeof(node_posts_t));
 		}
 		return new_post;
 	} else {
-		node_posts *new_repost = (node_posts *)malloc(sizeof(node_posts));
+		node_posts_t *new_repost = (node_posts_t *)malloc(sizeof(node_posts_t));
 		DIE(new_repost == NULL, "new_node malloc");
 		new_repost->likes = 0;
 		new_repost->user_id = get_user_id(name);
 		new_repost->title = NULL;
 		new_repost->post_id = post_id;
 		new_repost->parent_id = parent_id;
-		new_repost->children = malloc(MAX_POSTS * sizeof(node_posts *));
+		new_repost->children = malloc(MAX_POSTS * sizeof(node_posts_t *));
 		DIE(new_repost->children == NULL, "new_repost->children malloc");
 		for(int i = 0; i < MAX_POSTS; i++) {
-			new_repost->children[i] = malloc(sizeof(node_posts));
+			new_repost->children[i] = malloc(sizeof(node_posts_t));
 		}
 		return new_repost;
 	}
 }
 
-post_tree *create_post_tree(size_t data_size)
+post_tree_t *create_post_tree(size_t data_size)
 {
-	post_tree *new_tree = malloc(sizeof(post_tree));
+	post_tree_t *new_tree = malloc(sizeof(post_tree_t));
 	new_tree->root = NULL;
 	new_tree->data_size = data_size;
 	return new_tree;
 }
 
-post_array **create_post(post_array **tree_of_posts, char *name, char *title, int *num_posts)
+post_array_t **create_post(post_array_t **tree_of_posts, char *name, char *title, int *num_posts)
 {	
 	(*num_posts)++;
 	(*tree_of_posts)->number_of_posts = (*num_posts);
 	int number_of_posts = (*tree_of_posts)->number_of_posts;
-	post_tree **bigger_tree = realloc((*tree_of_posts)->posts,(number_of_posts) * sizeof(post_tree *));
+	post_tree_t **bigger_tree = realloc((*tree_of_posts)->posts,(number_of_posts) * sizeof(post_tree_t *));
 	DIE(bigger_tree == NULL, "bigger_tree malloc");
 	(*tree_of_posts)->posts = bigger_tree;
-	(*tree_of_posts)->posts[(*num_posts)  - 1] = create_post_tree(sizeof(node_posts));
+	(*tree_of_posts)->posts[(*num_posts)  - 1] = create_post_tree(sizeof(node_posts_t));
 	(*tree_of_posts)->posts[(*num_posts) - 1]->root = create_post_node(name, title, number_of_posts, 0, -1);
 	printf("Created %s for %s\n", (*tree_of_posts)->posts[(*num_posts) - 1]->root->title, name);
 
@@ -78,6 +78,7 @@ post_array **create_post(post_array **tree_of_posts, char *name, char *title, in
 void repost_post(char *name, int post_id)
 {
 	printf("< %s reposted post %d\n", name, post_id);
+
 }
 
 void repost_repost(char *name, int post_id, int repost_id)
@@ -135,12 +136,12 @@ void get_likes_post(int post_id)
 	printf("< Likes for post %d: 1\n", post_id);
 }
 
-void post(post_array **post_array)
+void post(post_array_t **post_array)
 {
 	printf("< Posts: %d1\n", (*post_array)->number_of_posts);
 }
 
-void handle_input_posts(char *input, post_array **post_array)
+void handle_input_posts(char *input, post_array_t **post_array)
 {
     char *commands = strdup(input);
     char *cmd = strtok(commands, "\n ");
@@ -169,7 +170,6 @@ void handle_input_posts(char *input, post_array **post_array)
 			int repost_id = atoi(repost_id_str);
 			repost_repost(name, post_id, repost_id);
 		}
-		post(post_array);
 	} else if (!strcmp(cmd, "common-repost")) {
 		char *post_id_str = strtok(NULL, " ");
     	int post_id = atoi(post_id_str);
