@@ -131,11 +131,21 @@ void common_repost(post_array_t **post_array,int post_id, int repost_id_1, int r
 	int parent_id_1 = repost_id_1, parent_id_2 = repost_id_2;
 	int orig_id_1 = repost_id_1, orig_id_2 = repost_id_2;
 	int ok = 1;
+	node_posts_t *node_1 = find_node_by_id((*post_array)->posts[post_id - 1]->root, repost_id_1);
+	node_posts_t *node_2 = find_node_by_id((*post_array)->posts[post_id - 1]->root, repost_id_2);
 	while (parent_id_1 != parent_id_2) {
-		node_posts_t *node_1 = find_node_by_id((*post_array)->posts[post_id - 1]->root, repost_id_1);
-		node_posts_t *node_2 = find_node_by_id((*post_array)->posts[post_id - 1]->root, repost_id_2);
-		if(node_1 == NULL || node_2 == NULL) {
-			printf("Repost not found\n");
+		if (repost_id_1 != (*post_array)->posts[post_id - 1]->root->post_id) {
+			node_1 = find_node_by_id((*post_array)->posts[post_id - 1]->root, repost_id_1);
+			
+		} 
+		if (repost_id_2 != (*post_array)->posts[post_id - 1]->root->post_id) {
+			node_2 = find_node_by_id((*post_array)->posts[post_id - 1]->root, repost_id_2);
+		}
+		if(node_1 == NULL) {
+			printf("Repost 1 not found\n");
+			return;
+		} else if (node_2 == NULL) {
+			printf("Repost 2 not found\n");
 			return;
 		}
 		repost_id_1 = node_1->parent_id;
