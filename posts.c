@@ -30,9 +30,6 @@ node_posts_t *create_post_node(char *name, char *title, int post_id, int repost_
 	new_post->children = malloc(MAX_POSTS * sizeof(node_posts_t *));
 	new_post->children_number = 0;
 	DIE(new_post->children == NULL, "new_node->children malloc");
-	for(int i = 0; i < MAX_POSTS; i++) {
-		new_post->children[i] = malloc(sizeof(node_posts_t));
-	}
 	if (repost_activity == 0) {
 		new_post->title = strdup(title);
 	} else {
@@ -56,12 +53,9 @@ post_array_t **create_post(post_array_t **tree_of_posts, char *name, char *title
 	(*tree_of_posts)->total_posts++;
 	int num_posts = (*tree_of_posts)->number_of_posts;
 	if (num_posts == 1) {
-		(*tree_of_posts)->posts = malloc(sizeof(post_tree_t *));
-		(*tree_of_posts)->posts[0] = malloc(sizeof(post_tree_t));
-		(*tree_of_posts)->posts[0]->root = NULL;
-		(*tree_of_posts)->posts[0]->number_of_reposts = 0;
+		(*tree_of_posts)->posts = malloc(1 * sizeof(post_tree_t *));
 	} else {
-		post_tree_t **bigger_tree = realloc((*tree_of_posts)->posts,(num_posts) * sizeof(post_tree_t *));
+		post_tree_t **bigger_tree = realloc((*tree_of_posts)->posts, (num_posts) * sizeof(post_tree_t *));
 		DIE(bigger_tree == NULL, "bigger_tree malloc");
 		(*tree_of_posts)->posts = bigger_tree;
 	}
@@ -78,7 +72,6 @@ void repost_post(post_array_t **tree_of_posts, char *name, int post_id)
 	for (int i = 0; i < (*tree_of_posts)->number_of_posts; i++) {
 		if ((*tree_of_posts)->posts[i]->root->post_id == post_id) {
 			root_id = i;
-			//repost_nr = (*tree_of_posts)->posts[i]->number_of_reposts;
 			repost_nr = (*tree_of_posts)->posts[i]->root->children_number;
 			(*tree_of_posts)->posts[i]->root->children_number++;
 			(*tree_of_posts)->posts[i]->number_of_reposts++;
@@ -136,7 +129,7 @@ void common_repost(post_array_t **post_array,int post_id, int repost_id_1, int r
 	while (parent_id_1 != parent_id_2) {
 		if (repost_id_1 != (*post_array)->posts[post_id - 1]->root->post_id) {
 			node_1 = find_node_by_id((*post_array)->posts[post_id - 1]->root, repost_id_1);
-			
+
 		} 
 		if (repost_id_2 != (*post_array)->posts[post_id - 1]->root->post_id) {
 			node_2 = find_node_by_id((*post_array)->posts[post_id - 1]->root, repost_id_2);
@@ -241,6 +234,27 @@ void post(post_array_t **post_array)
 	printf("< Posts: %d1\n", (*post_array)->number_of_posts);
 }
 
+void free_post_tree(node_posts_t **root)
+{
+	for (int i = 0; i < (*root)->children_number; i++) {
+		free_post_tree(&((*root)->children[i]));
+	}
+	free((*root)->children);
+	if((*root)->title != NULL) {
+		free((*root)->title);
+	}
+	free(*root);
+}
+
+void free_post_array(post_array_t **post_array)
+{
+	for (int i = 0; i < (*post_array)->number_of_posts; i++) {
+		free_post_tree(&((*post_array)->posts[i]->root));
+		free((*post_array)->posts[i]);
+	}
+	free((*post_array)->posts);
+}
+
 void handle_input_posts(char *input, post_array_t **post_array)
 {
     char *commands = strdup(input);
@@ -258,6 +272,7 @@ void handle_input_posts(char *input, post_array_t **post_array)
 		}
 		title[beta - x] = '\0';
     	post_array = create_post(post_array, name, title);
+		free(title);
 	} else if (!strcmp(cmd, "repost")) {
 		char *name = strtok(NULL, " ");
 		char *post_id_string = strtok(NULL, " \n");
@@ -333,5 +348,5 @@ void handle_input_posts(char *input, post_array_t **post_array)
 			get_likes_repost(post_id, repost_id);
 		}
 	}
-	
+	free(commands);
 }
