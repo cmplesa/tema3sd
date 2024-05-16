@@ -107,7 +107,7 @@ void repost_repost(post_array_t **tree_of_posts, char *name, int post_id, int re
 			if (found != NULL) {
 				new_post_id = ++(*tree_of_posts)->total_posts;
 				(*tree_of_posts)->posts[i]->number_of_reposts++;
-				found->children[found->children_number] = create_post_node(name, NULL, new_post_id, 1, post_id);
+				found->children[found->children_number] = create_post_node(name, NULL, new_post_id, 1, found->post_id);
 				found->children_number++;
 				break;
 			} else {
@@ -119,9 +119,31 @@ void repost_repost(post_array_t **tree_of_posts, char *name, int post_id, int re
 	printf("Created repost #%d for %s\n",new_post_id, name);
 }
 
-void common_repost(int post_id, int repost_id_1, int repost_id_2)
+void common_repost(post_array_t **post_array,int post_id, int repost_id_1, int repost_id_2)
 {
-	printf("< Common reposts between %d and %d: %d\n", repost_id_1, repost_id_2, post_id);
+	int parent_id_1 = repost_id_1, parent_id_2 = repost_id_2;
+	int orig_id_1 = repost_id_1, orig_id_2 = repost_id_2;
+	int ok = 1;
+	while(parent_id_1 != parent_id_2) {
+		node_posts_t *node_1 = find_node_by_id((*post_array)->posts[post_id - 1]->root, repost_id_1);
+		node_posts_t *node_2 = find_node_by_id((*post_array)->posts[post_id - 1]->root, repost_id_2);
+		repost_id_1 = node_1->parent_id;
+		repost_id_2 = node_2->parent_id;
+		parent_id_1 = node_1->parent_id;
+		parent_id_2 = node_2->parent_id;
+		if(parent_id_1 == orig_id_2 ) {
+			ok = 0;
+			printf("The firs common repost of %d and %d is %d\n", orig_id_1, orig_id_2, orig_id_2);
+			break;
+		} else if (parent_id_2 == orig_id_1) {
+			ok = 0;
+			printf("The firs common repost of %d and %d is %d\n", orig_id_1, orig_id_2, orig_id_1);
+			break;
+		}
+	}
+	if(ok == 1) {
+	printf("The firs common repost of %d and %d is %d\n", orig_id_1, orig_id_2, parent_id_1);
+	}
 }
 
 void like_post(char *name, int post_id)
@@ -209,7 +231,7 @@ void handle_input_posts(char *input, post_array_t **post_array)
     	int repost_id_1 = atoi(repost_id_1_str);
     	char *repost_id_2_str = strtok(NULL, " ");
     	int repost_id_2 = atoi(repost_id_2_str);
-		common_repost(post_id, repost_id_1, repost_id_2);
+		common_repost(post_array, post_id, repost_id_1, repost_id_2);
 	} else if (!strcmp(cmd, "like")) {
 		char *name = strtok(NULL, " ");
 		char *post_id_str = strtok(NULL, " ");
