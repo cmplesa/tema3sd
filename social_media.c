@@ -38,6 +38,7 @@ int main(void)
 	init_tasks();
 
 	char *input = (char *)malloc(MAX_COMMAND_LEN);
+
 	int **relations = malloc(MAX_PEOPLE * sizeof(int *));
 	for (int i = 0; i < MAX_PEOPLE; i++) {
 		relations[i] = malloc(MAX_PEOPLE * sizeof(int));
@@ -45,9 +46,11 @@ int main(void)
 			relations[i][j] = 0;
 		}
 	}
+
 	post_array_t *posts = malloc(sizeof(post_array_t));
 	posts->number_of_posts = 0;
 	posts->total_posts = 0;
+
 	while (1) {
 		char *command = fgets(input, MAX_COMMAND_LEN, stdin);
 
@@ -73,12 +76,9 @@ int main(void)
 	}
 	free(relations);
 
-	for(int i = 0; i < posts->number_of_posts; i++) {
-		free(posts->posts[i]);
-	}
-	if (posts->number_of_posts > 0) {
-		free(posts->posts);
-	}
+	#ifdef TASK_2
+	free_post_array(&posts);
+	#endif
 	free(posts);
 
 	free_users();
