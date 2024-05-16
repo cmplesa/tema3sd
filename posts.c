@@ -133,16 +133,16 @@ void common_repost(post_array_t **post_array,int post_id, int repost_id_1, int r
 		parent_id_2 = node_2->parent_id;
 		if(parent_id_1 == orig_id_2 ) {
 			ok = 0;
-			printf("The firs common repost of %d and %d is %d\n", orig_id_1, orig_id_2, orig_id_2);
+			printf("The first common repost of %d and %d is %d\n", orig_id_1, orig_id_2, orig_id_2);
 			break;
 		} else if (parent_id_2 == orig_id_1) {
 			ok = 0;
-			printf("The firs common repost of %d and %d is %d\n", orig_id_1, orig_id_2, orig_id_1);
+			printf("The first common repost of %d and %d is %d\n", orig_id_1, orig_id_2, orig_id_1);
 			break;
 		}
 	}
 	if(ok == 1) {
-	printf("The firs common repost of %d and %d is %d\n", orig_id_1, orig_id_2, parent_id_1);
+	printf("The first common repost of %d and %d is %d\n", orig_id_1, orig_id_2, parent_id_1);
 	}
 }
 
@@ -189,11 +189,6 @@ void get_reposts_repost(int post_id, int repost_id)
 void get_likes_post(int post_id)
 {
 	printf("< Likes for post %d: 1\n", post_id);
-}
-
-void post(post_array_t **post_array)
-{
-	printf("< Posts: %d1\n", (*post_array)->number_of_posts);
 }
 
 void handle_input_posts(char *input, post_array_t **post_array)
