@@ -26,9 +26,11 @@ node_posts *create_post_node(char *name, char *title, int post_id, int repost_ac
 		DIE(new_post == NULL, "new_node malloc");
 		new_post->likes = 0;
 		new_post->user_id = get_user_id(name);
-		new_post->title = malloc(sizeof(strlen(title) + 1));
-		printf("%s -> %ld\n", title, strlen(title) + 1);
-		memcpy(new_post->title, title, strlen(title) + 1);
+		//new_post->title = malloc(sizeof(strlen(title) + 1));
+		new_post->title = strdup(title);
+		//printf("%s -> %ld\n", title, strlen(title) + 1);
+		//memcpy(new_post->title, title, strlen(title) + 1);
+		//sprintf(new_post->title, "%s", title);
 		new_post->parent_id = parent_id;
 		new_post->post_id = post_id;
 		new_post->children = malloc(MAX_POSTS * sizeof(node_posts *));
@@ -68,12 +70,12 @@ post_array **create_post(post_array **tree_of_posts, char *name, char *title, in
 	//printf("%d\n", (*num_posts));
 	(*tree_of_posts)->number_of_posts = (*num_posts);
 	//printf("%d\n", (*tree_of_posts)->number_of_posts);
-	(*tree_of_posts)->number_of_posts = (*num_posts);
+	//(*tree_of_posts)->number_of_posts = (*num_posts);
 	int number_of_posts = (*tree_of_posts)->number_of_posts;
 	post_tree **bigger_tree = realloc((*tree_of_posts)->posts,(number_of_posts) * sizeof(post_tree *));
-	DIE(bigger_tree == NULL, "bigger_tree malloc");
+	//DIE(bigger_tree == NULL, "bigger_tree malloc");
 	(*tree_of_posts)->posts = bigger_tree;
-	printf("Created %s for %d\n", title, get_user_id(name));
+	printf("Created %s for %s\n", title, name);
 	//printf("%d", (*num_posts));
 	(*tree_of_posts)->posts[(*num_posts)  - 1] = create_post_tree(sizeof(node_posts));
 	
