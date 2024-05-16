@@ -48,12 +48,6 @@ int main(void)
 	post_array_t *posts = malloc(sizeof(post_array_t));
 	posts->number_of_posts = 0;
 	posts->total_posts = 0;
-	posts->posts = malloc(1 * sizeof(post_tree_t *));
-	for(int i = 0; i < 1; i++) {
-		posts->posts[i] = malloc(sizeof(post_tree_t));
-		posts->posts[i]->root = NULL;
-		posts->posts[i]->number_of_reposts = 0;
-	}
 	while (1) {
 		char *command = fgets(input, MAX_COMMAND_LEN, stdin);
 
@@ -82,7 +76,9 @@ int main(void)
 	for(int i = 0; i < posts->number_of_posts; i++) {
 		free(posts->posts[i]);
 	}
-	free(posts->posts);
+	if (posts->number_of_posts > 0) {
+		free(posts->posts);
+	}
 	free(posts);
 
 	free_users();
