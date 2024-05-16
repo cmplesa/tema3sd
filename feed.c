@@ -14,14 +14,37 @@ void feed(int ***relations,char *name, int feed_size)
 	printf("%d", (*relations)[0][0]);
 }
 
+/*
+view-profile <nume>
+Afișează toate postările și repostările unui utilizator.
+Exemplu:
+> create Andrei "Prima mea postare" 
+> create Mihai "Al doilea" 
+> create Alex "Shaorma e veatza mea" 
+> repost Andrei 2 
+> view-profile Andrei 
+< Posted: "Prima mea postare" 
+< Reposted: "Shaorma e veatza mea"
+*/
 
-node_posts_t *print_node_by_user_id(node_posts_t *root, int user_id)
+node_posts_t *print_node_by_user_id(node_posts_t *root, node_posts_t *root_check, int user_id)
 {
-	if (root->user_id == user_id) {
-		printf("Reposted %s", root->title);
+	if (root->user_id == user_id && root != root_check) {
+		printf("Reposted %s\n", root->title);
 	}
 	for (int i = 0; i < root->children_number; i++) {
-		print_node_by_user_id(root->children[i], user_id);
+		print_node_by_user_id(root->children[i], root_check, user_id);
+	}
+	return NULL;
+}
+
+node_posts_t *print_node_by_user_id_repost(node_posts_t *root, int user_id)
+{
+	if (root->user_id == user_id) {
+		printf("Reposted %s\n", root->title);
+	}
+	for (int i = 0; i < root->children_number; i++) {
+		print_node_by_user_id_repost(root->children[i], user_id);
 	}
 	return NULL;
 }
@@ -30,8 +53,10 @@ void view_profile(post_array_t **post_array,char *name)
 {
 	for (int i = 0; i < (*post_array)->number_of_posts; i++) {
 		if((*post_array)->posts[i]->root->user_id == get_user_id(name)) {
-			printf("Posted %s", (*post_array)->posts[i]->root->title);
-			print_node_by_user_id((*post_array)->posts[i]->root, get_user_id(name));
+			printf("Posted: %s\n", (*post_array)->posts[i]->root->title);
+			print_node_by_user_id((*post_array)->posts[i]->root, (*post_array)->posts[i]->root, get_user_id(name));
+		} else {
+			print_node_by_user_id_repost((*post_array)->posts[i]->root, get_user_id(name));
 		}
 	}
 }
@@ -51,8 +76,8 @@ void handle_input_feed(char *input, post_array_t **post_array, int ***relations)
 {
 	char *commands = strdup(input);
 	char *cmd = strtok(commands, "\n ");
-	handle_input_friends(input, relations);
-	handle_input_posts(input, post_array);
+	//handle_input_friends(input, relations);
+	//handle_input_posts(input, post_array);
 	if (!cmd)
 		return;
 
@@ -74,4 +99,3 @@ void handle_input_feed(char *input, post_array_t **post_array, int ***relations)
 		see_common_group(name);
 	}
 }
-
