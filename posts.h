@@ -7,34 +7,34 @@
  * Please add any necessary parameters to the functions
 */
 
-typedef struct node_posts node_posts;
-struct  node_posts {
-	/* left child */
-	node_posts **children;
+typedef struct node_posts_t node_posts_t;
+struct  node_posts_t {
+	
+	node_posts_t **children;
     int parent_id;
 	/* data contained by the node */
 	int likes;
-    int user_id;
+    uint16_t user_id;
     char *title;
     int post_id;
 };
 
-typedef struct post_tree post_tree;
-struct post_tree {
+typedef struct post_tree_t post_tree_t;
+struct post_tree_t {
 	/* root of the tree */
-	node_posts  *root;
+	node_posts_t  *root;
 	int number_of_reposts;
 	 /* size of the data contained by the nodes */
 	size_t data_size;
 };
 
-typedef struct post_array post_array;
-struct post_array {
-	post_tree **posts;
+typedef struct post_array_t post_array_t;
+struct post_array_t {
+	post_tree_t **posts;
 	int number_of_posts;
 };
 
 
-void handle_input_posts(char *input, post_array **posts);
+void handle_input_posts(char *input, post_array_t **posts);
 
 #endif // POSTS_H
