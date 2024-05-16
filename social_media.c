@@ -9,6 +9,17 @@
 #include "friends.h"
 #include "posts.h"
 #include "feed.h"
+#include <errno.h>
+
+#define DIE(assertion, call_description)				\
+	do {								\
+		if (assertion) {					\
+			fprintf(stderr, "(%s, %d): ",			\
+					__FILE__, __LINE__);		\
+			perror(call_description);			\
+			exit(errno);					\
+		}							\
+	} while (0)
 
 /**
  * Initializez every task based on which task we are running
@@ -38,18 +49,24 @@ int main(void)
 	init_tasks();
 
 	char *input = (char *)malloc(MAX_COMMAND_LEN);
+	DIE(input == NULL, "input malloc");
 	int **relations = malloc(MAX_PEOPLE * sizeof(int *));
+	DIE(relations == NULL, "relations malloc");
 	for (int i = 0; i < MAX_PEOPLE; i++) {
 		relations[i] = malloc(MAX_PEOPLE * sizeof(int));
+		DIE(relations[i] == NULL, "relations[i] malloc");
 		for (int j = 0; j < MAX_PEOPLE; j++) {
 			relations[i][j] = 0;
 		}
 	}
 	post_array *posts = malloc(sizeof(post_array));
+	DIE(posts == NULL, "posts malloc");
 	posts->number_of_posts = 0;
 	posts->posts = malloc(5 * sizeof(post_tree *));
+	DIE(posts->posts == NULL, "posts->posts malloc");
 	for(int i = 0; i < 5; i++) {
 		posts->posts[i] = malloc(sizeof(post_tree));
+		DIE(posts->posts[i] == NULL, "posts->posts[i] malloc");
 		posts->posts[i]->root = NULL;
 		posts->posts[i]->number_of_reposts = 0;
 	}
