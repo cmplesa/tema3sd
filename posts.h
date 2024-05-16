@@ -36,6 +36,9 @@ struct post_array_t {
 	int total_posts;
 };
 
+void free_post_tree(node_posts_t **root);
+
+void free_post_array(post_array_t **post_array);
 
 void handle_input_posts(char *input, post_array_t **posts);
 
