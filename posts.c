@@ -1,60 +1,3 @@
-/*
-## Task 2 (Postări și reposturi)
-
-Pentru această etapă, vom lucra cu o structură de date arborescentă, care va fi folosită pentru a stoca postările și reposturile. Fiecare postare va avea un id unic și va putea avea mai multe reposturi. Un repost va fi o postare în sine, care va avea un id unic și va fi legată de postarea originală. Vom folosi un arbore pentru a stoca aceste postări și reposturi, unde fiecare nod va avea un câmp `events`, care va fi un arbore de postări și reposturi.
-
-```
-struct {
-    id: number,
-    titlu: string,
-    user_id: number,
-    events: tree
-}
-```
-
-### Creează o postare
-
-`create <nume> <titlu>`
-
-Utilizatorul `<nume>` va crea o postare cu titlul `<titlu>`. Fiecare postare va avea un id unic, care va fi incrementat la fiecare postare nouă.
-
-Exemplu:
-
-```
-> create Mihai "Titlu postare"
-< Created "Titlu postare" for Mihai
-```
-*/
-
-
-
-/*
-
-struct info {
-	int id;
-	char *title;
-	int user_id;
-};
-
-struct node_tree {
-	info *data;
-	node_tree **children;
-};
-}
-
-struct tree {
-	node_tree *root;
-};
-}
-struct {
-	tree *events;
-}
-
-1. Am creat structurile necesare pentru a stoca postarile si reposturile si ma gandeam
-sa folosesc un vector de arbori si la fiecare arbore[i] sa fie rootul, postarea i si sa
-aiba arborele cu toate reposturile.
-
-*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -84,7 +27,29 @@ node_posts *create_post_node(char *name, char *title, int post_id, int repost_ac
 		new_post->likes = 0;
 		new_post->user_id = get_user_id(name);
 		new_post->title = malloc(sizeof(strlen(title) + 1));
-		strcpy(new_post->title, title);
+		printf("%s\n", title);
+		// eroarea e la memcpy
+		/*
+		1@realDonaldTrump Did you really start mewing to skibidi ohio? Are you a sigma or did you get fandum taxxed
+==1555984== Invalid write of size 1
+==1555984==    at 0x4852A13: memmove (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==1555984==    by 0x10968E: create_post_node (posts.c:89)
+==1555984==    by 0x109A7B: create_post (posts.c:138)
+==1555984==    by 0x109E19: handle_input_posts (posts.c:230)
+==1555984==    by 0x10A548: main (social_media.c:69)
+==1555984==  Address 0x4bda988 is 0 bytes after a block of size 8 alloc'd
+==1555984==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==1555984==    by 0x109650: create_post_node (posts.c:86)
+==1555984==    by 0x109A7B: create_post (posts.c:138)
+==1555984==    by 0x109E19: handle_input_posts (posts.c:230)
+==1555984==    by 0x10A548: main (social_media.c:69)
+==1555984== 
+--1555984-- VALGRIND INTERNAL ERROR: Valgrind received a signal 11 (SIGSEGV) - exiting
+--1555984-- si_code=128;  Faulting address: 0x0;  sp: 0x1002ca9e20
+
+  		
+		*/
+		memcpy(new_post->title, title, strlen(title) + 1);
 		new_post->parent_id = parent_id;
 		new_post->post_id = post_id;
 		new_post->children = malloc(MAX_POSTS * sizeof(node_posts *));
@@ -121,14 +86,20 @@ post_tree *create_post_tree(size_t data_size)
 post_array **create_post(post_array **tree_of_posts, char *name, char *title, int *num_posts)
 {	
 	(*num_posts)++;
+	printf("%d\n", (*num_posts));
+	(*tree_of_posts)->number_of_posts = (*num_posts);
+	printf("%d\n", (*tree_of_posts)->number_of_posts);
 	(*tree_of_posts)->number_of_posts = (*num_posts);
 	int number_of_posts = (*tree_of_posts)->number_of_posts;
 	post_tree **bigger_tree = realloc((*tree_of_posts)->posts,(number_of_posts) * sizeof(post_tree *));
 	DIE(bigger_tree == NULL, "bigger_tree malloc");
 	(*tree_of_posts)->posts = bigger_tree;
+	printf("< Created %s for %d\n", title, get_user_id(name));
+	printf("%d", (*num_posts));
 	(*tree_of_posts)->posts[(*num_posts)  - 1] = create_post_tree(sizeof(node_posts));
+	
 	(*tree_of_posts)->posts[(*num_posts) - 1]->root = create_post_node(name, title, number_of_posts, 0, -1);
-	printf("< Created \"%s\" for %d\n", (*tree_of_posts)->posts[0]->root->title, (*tree_of_posts)->posts[0]->root->user_id);
+	// printf("< Created %s for %d\n", (*tree_of_posts)->posts[0]->root->title, (*tree_of_posts)->posts[0]->root->user_id);
 
 	
 	
@@ -196,19 +167,32 @@ void get_likes_post(int post_id)
 	printf("< Likes for post %d: 1\n", post_id);
 }
 
+void post(post_array **post_array)
+{
+	printf("< Posts: %d1\n", (*post_array)->number_of_posts);
+}
+
 void handle_input_posts(char *input, post_array **post_array)
 {
-	char *commands = strdup(input);
-	char *cmd = strtok(commands, "\n ");
+    char *commands = strdup(input);
+    char *cmd = strtok(commands, "\n ");
+	printf("%s\n", input);
 	int number_of_posts = 0;
-	
-	if (!cmd)
-		return;
+    if (!cmd)
+        return;
 
-	if (!strcmp(cmd, "create")) {
+    if (!strcmp(cmd, "create")) {
+        // printf("%s\n", commands);
+		// printf("%s\n", cmd);
 		char *name = strtok(NULL, " ");
-    	char *title = strtok(NULL, "\"");
-    	title = strtok(NULL, "\""); // pentru a obține titlul între ghilimele
+		char *title = malloc(90*sizeof(char));
+		int x = strlen(name) + strlen(cmd) + 2;
+		int beta = strlen(input);
+		for(int i = x; i < beta; i++) {
+			title[i - x] = input[i];
+		}
+		// printf("%s\n", nume);
+		// printf("%s\n", titlu);
     	post_array = create_post(post_array, name, title, &number_of_posts);
 	} else if (!strcmp(cmd, "repost")) {
 		char *name = strtok(NULL, " ");
@@ -221,6 +205,7 @@ void handle_input_posts(char *input, post_array **post_array)
 			int repost_id = atoi(repost_id_str);
 			repost_repost(name, post_id, repost_id);
 		}
+		post(post_array);
 	} else if (!strcmp(cmd, "common-repost")) {
 		char *post_id_str = strtok(NULL, " ");
     	int post_id = atoi(post_id_str);
@@ -285,5 +270,6 @@ void handle_input_posts(char *input, post_array **post_array)
 			get_likes_repost(post_id, repost_id);
 		}
 	}
+	
 }
 
