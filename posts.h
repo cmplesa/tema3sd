@@ -18,6 +18,7 @@ struct  node_posts_t {
 	char *title;
 	int post_id;
 	int children_number;
+	int *like_list;
 };
 
 typedef struct post_tree_t post_tree_t;
