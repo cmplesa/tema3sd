@@ -28,28 +28,23 @@ Exemplu:
 
 int check_if_friend(int ***relations, int user_id, int friend_id)
 {
-	if (user_id == friend_id) {
+	if (user_id == friend_id || (*relations)[user_id][friend_id] == 1) {
 		return 1;
-	}
-	for (int i = 0; i < MAX_PEOPLE; i++) {
-		if ((*relations)[user_id][i] == 1) {
-			return 1;
-		}
 	}
 	return 0;
 }
 
 void print_reposts_feed(int ***relations, node_posts_t *root, int user_id, int *feed_size)
 {
+	if ((*feed_size) == 0) {
+			return;
+	}
 	for (int i = 0; i < root->children_number; i++) {
 		if(root->children[i]->post_id == -1) {
 			continue;
 		}
-		if ((*feed_size) == 0) {
-			return;
-		}
 		print_reposts_feed(relations, root->children[i], user_id, feed_size);
-		if (check_if_friend(relations, root->children[i]->user_id, user_id)) {
+		if (check_if_friend(relations, root->children[i]->user_id, user_id) && (*feed_size) > 0){
 			printf("%s: %s\n", get_user_name(root->children[i]->user_id), root->children[i]->title);
 			(*feed_size)--;
 		}
@@ -58,19 +53,21 @@ void print_reposts_feed(int ***relations, node_posts_t *root, int user_id, int *
 
 void feed(post_array_t **post_array, int ***relations, char *name, int feed_size)
 {
-	for (int i = 0; i < (*post_array)->number_of_posts; i++) {
+	//printf("Feed for %s\n", name);
+	for (int i = (*post_array)->number_of_posts - 1; i >= 0; i--) {
 		if ((*post_array)->posts[i]->root->user_id == get_user_id(name)) {
 			node_posts_t *root = (*post_array)->posts[i]->root;
 			printf("%s: %s\n", get_user_name(root->user_id), root->title);
 			feed_size--;
-			print_reposts_feed(relations, root, root->user_id, &feed_size);
+			//print_reposts_feed(relations, root, root->user_id, &feed_size);
 		} else {
 			node_posts_t *root = (*post_array)->posts[i]->root;
 			if (check_if_friend(relations, get_user_id(name), root->user_id)) {
+				//printf("%s is frind with %s\n", name, get_user_name(root->user_id));
 				printf("%s: %s\n", get_user_name(root->user_id), root->title);
 				feed_size--;
 			}
-			print_reposts_feed(relations, root, get_user_id(name), &feed_size);
+			//print_reposts_feed(relations, root, get_user_id(name), &feed_size);
 		}
 	}
 }
@@ -148,4 +145,6 @@ void handle_input_feed(char *input, post_array_t **post_array, int ***relations)
 		char *name = strtok(NULL, " \n");
 		see_common_group(name);
 	}
+
+	free(commands);
 }
