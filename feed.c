@@ -109,10 +109,25 @@ void view_profile(post_array_t **post_array,char *name)
 	}
 }
 
-void see_friends_reposted(char *name, int post_id)
+void print_friends_that_reposted (int ***relations, node_posts_t *root, int user_id, int post_id)
 {
-	printf("Friends that reposted %s\n", name);
-	printf("Post id: %d\n", post_id);
+	if (check_if_friend(relations, root->user_id, user_id) && get_user_name(root->user_id) != get_user_name(user_id)){
+		printf("%s\n", get_user_name(root->user_id));
+	}
+	for (int i = 0; i < root->children_number; i++) {
+		print_friends_that_reposted(relations, root->children[i], user_id, post_id);
+	}
+}
+
+void see_friends_reposted(int ***relations , post_array_t **post_array, char *name, int post_id)
+{	
+	for (int i = 0; i < (*post_array)->number_of_posts; i++) {
+		if ((*post_array)->posts[i]->root->post_id == post_id) {
+			node_posts_t *root = (*post_array)->posts[i]->root;
+			print_friends_that_reposted(relations, root, get_user_id(name), post_id);
+			break;
+		}
+	}	
 }
 
 void see_common_group(char *name)
@@ -140,11 +155,10 @@ void handle_input_feed(char *input, post_array_t **post_array, int ***relations)
 		char *name = strtok(NULL, " \n");
 		char *post_id_str = strtok(NULL, " \n");
 		int post_id = atoi(post_id_str);
-		see_friends_reposted(name, post_id);
+		see_friends_reposted(relations, post_array, name, post_id);
 	} else if (!strcmp(cmd, "common-groups")) {
 		char *name = strtok(NULL, " \n");
 		see_common_group(name);
 	}
-
 	free(commands);
 }
