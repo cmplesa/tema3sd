@@ -34,7 +34,10 @@ noul arbore creeat se pune in root nodul noii postari.
 - In cazul repostarii, se adauga un copil nou post-ului sau repost-ului la care
 se face repost(postarea originala se cauta dupa id-ul fiecarui root al
 arborilor).
-- La primul repost comun !!!TO DO!!!
+- La primul repost comun folosesc functia find_node_by_id pentru a gasi nodul
+dupa parent_id si urc in arbore pana gasesc un stramos comun. Verific daca
+unul dintre id-urile gasite este acelasi cu unul dintre originali, deoarece in
+acest caz, acel nod este deja fiul celuilalt.
 - La comanda de like, se cauta post-ul sau repost-ul dat, si in functie de caz
 ii da like sau unlike, si modifica array-ul de like-uri al postarii.
 - In cazul comenzii ratio, se cauta postarea dupa id, se trece prin toii copiii
