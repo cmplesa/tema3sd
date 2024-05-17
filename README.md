@@ -1,6 +1,7 @@
 **Echipa tema 3 SD:**
-- matei.hutu - **Nume: Hutu Matei ALexandru**
+- matei.hutu - **Nume: Hutu Matei Alexandru**
 - marian_cosmin.plesa - **Nume: Plesa Marian Cosmin**
+  
 **Grupă: 311CA**
 
 ## Tema 3:
