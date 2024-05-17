@@ -7,25 +7,6 @@
 #include "friends.h"
 #include "posts.h"
 
-/*feed <nume> <feed-size>
-
-Afișează cele mai recente <feed-size> postări ale unui utilizator și ale prietenilor lui.
-
-Exemplu:
-
-> create Andrei "Prima mea postare" 
-> create Mihai "Al doilea" 
-> create Mihnea "Vand Golf 4" 
-> create Alex "Buna TPU, merita sa dau la Poli?" 
-> create Ana "Ati auzit ultima melodie a lui Kanye?" 
-> create Luca "Nu-mi vine sa cred cine a castigat Grand Prix-ul de la Miami" 
-> feed Andrei 5 
-< Luca: "Nu-mi vine sa cred cine a castigat Grand Prix-ul de la Miami" 
-< Ana: "Ati auzit ultima melodie a lui Kanye?" 
-< Alex: "Buna TPU, merita sa dau la Poli?" 
-< Mihnea: "Vand Golf 4" 
-< Mihai: "Al doilea"*/
-
 int check_if_friend(int ***relations, int user_id, int friend_id)
 {
 	if (user_id == friend_id || (*relations)[user_id][friend_id] == 1) {
@@ -53,21 +34,17 @@ void print_reposts_feed(int ***relations, node_posts_t *root, int user_id, int *
 
 void feed(post_array_t **post_array, int ***relations, char *name, int feed_size)
 {
-	//printf("Feed for %s\n", name);
 	for (int i = (*post_array)->number_of_posts - 1; i >= 0; i--) {
 		if ((*post_array)->posts[i]->root->user_id == get_user_id(name)) {
 			node_posts_t *root = (*post_array)->posts[i]->root;
 			printf("%s: %s\n", get_user_name(root->user_id), root->title);
 			feed_size--;
-			//print_reposts_feed(relations, root, root->user_id, &feed_size);
 		} else {
 			node_posts_t *root = (*post_array)->posts[i]->root;
 			if (check_if_friend(relations, get_user_id(name), root->user_id)) {
-				//printf("%s is frind with %s\n", name, get_user_name(root->user_id));
 				printf("%s: %s\n", get_user_name(root->user_id), root->title);
 				feed_size--;
 			}
-			//print_reposts_feed(relations, root, get_user_id(name), &feed_size);
 		}
 	}
 }
@@ -96,20 +73,22 @@ node_posts_t *print_node_by_user_id_repost(node_posts_t *root, int user_id, char
 
 void view_profile(post_array_t **post_array,char *name)
 {
-
 	for (int i = 0; i < (*post_array)->number_of_posts; i++) {
 		if((*post_array)->posts[i]->root->user_id == get_user_id(name)) {
 			node_posts_t *root = (*post_array)->posts[i]->root;
 			printf("Posted: %s\n", root->title);
 			print_node_by_user_id(root, root, get_user_id(name));
-		} else {
+		}
+	}
+	for (int i = 0; i < (*post_array)->number_of_posts; i++) {
+		if((*post_array)->posts[i]->root->user_id != get_user_id(name)) {
 			node_posts_t *root = (*post_array)->posts[i]->root;
 			print_node_by_user_id_repost(root, get_user_id(name), root->title);
 		}
 	}
 }
 
-void print_friends_that_reposted (int ***relations, node_posts_t *root, int user_id, int post_id)
+void print_friends_that_reposted(int ***relations, node_posts_t *root, int user_id, int post_id)
 {
 	if (check_if_friend(relations, root->user_id, user_id) && get_user_name(root->user_id) != get_user_name(user_id)){
 		printf("%s\n", get_user_name(root->user_id));
@@ -130,9 +109,46 @@ void see_friends_reposted(int ***relations , post_array_t **post_array, char *na
 	}	
 }
 
-void see_common_group(char *name)
+void see_common_group(int ***relations, char *name)
 {
-	printf("Common groups for %s\n", name);
+	int user_id = get_user_id(name);
+	int *friends = malloc(MAX_PEOPLE * sizeof(int));
+	int friends_size = 0;
+	for (int i = 0; i < MAX_PEOPLE; i++) {
+		if ((*relations)[user_id][i] == 1 || i == user_id) {
+			friends[friends_size] = i;
+			friends_size++;
+		}
+	}
+	while (1) {
+		int min_common_friends = friends_size;
+		int min_common_friend = -1;
+		for (int i = 0; i < friends_size; i++) {
+			int common_friends = 0;
+			for (int j = 0; j < friends_size; j++) {
+				if ((*relations)[friends[i]][friends[j]] == 1) {
+					common_friends++;
+				}
+			}
+			if (common_friends < min_common_friends) {
+				min_common_friends = common_friends;
+				min_common_friend = i;
+			}
+		}
+		if (min_common_friends < friends_size - 1) {
+			for (int i = min_common_friend; i < friends_size - 1; i++) {
+				friends[i] = friends[i + 1];
+			}
+			friends_size--;
+		} else {
+			break;
+		}
+	}
+	printf("The closest friend group of %s is:\n", name);
+	for (int i = 0; i < friends_size; i++) {
+		printf("%s\n", get_user_name(friends[i]));
+	}
+	free(friends);
 }
 
 void handle_input_feed(char *input, post_array_t **post_array, int ***relations)
@@ -156,9 +172,9 @@ void handle_input_feed(char *input, post_array_t **post_array, int ***relations)
 		char *post_id_str = strtok(NULL, " \n");
 		int post_id = atoi(post_id_str);
 		see_friends_reposted(relations, post_array, name, post_id);
-	} else if (!strcmp(cmd, "common-groups")) {
+	} else if (!strcmp(cmd, "common-group")) {
 		char *name = strtok(NULL, " \n");
-		see_common_group(name);
+		see_common_group(relations, name);
 	}
 	free(commands);
 }
