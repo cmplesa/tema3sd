@@ -91,9 +91,6 @@ node_posts_t *find_node_by_id(node_posts_t *root, int post_id)
 		return root;
 	}
 	for (int i = 0; i < root->children_number; i++) {
-		if (root->children[i] == NULL) {
-			continue;
-		}
 		node_posts_t *found = find_node_by_id(root->children[i], post_id);
 		if (found != NULL) {
 			return found;
@@ -358,7 +355,9 @@ void free_post_array(post_array_t **post_array)
 		free_post_tree(&((*post_array)->posts[i]->root));
 		free((*post_array)->posts[i]);
 	}
-	free((*post_array)->posts);
+	if ((*post_array)->number_of_posts > 0) {
+		free((*post_array)->posts);
+	}
 }
 
 void handle_input_posts(char *input, post_array_t **post_array)
