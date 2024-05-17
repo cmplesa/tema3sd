@@ -15,37 +15,14 @@ int check_if_friend(int ***relations, int user_id, int friend_id)
 	return 0;
 }
 
-void print_reposts_feed(int ***relations, node_posts_t *root, int user_id, int *feed_size)
-{
-	if ((*feed_size) == 0) {
-			return;
-	}
-	for (int i = 0; i < root->children_number; i++) {
-		if(root->children[i]->post_id == -1) {
-			continue;
-		}
-		print_reposts_feed(relations, root->children[i], user_id, feed_size);
-		if (check_if_friend(relations, root->children[i]->user_id, user_id) && (*feed_size) > 0){
-			printf("%s: %s\n", get_user_name(root->children[i]->user_id), root->children[i]->title);
-			(*feed_size)--;
-		}
-	}
-}
-
 void feed(post_array_t **post_array, int ***relations, char *name, int feed_size)
 {
 	for (int i = (*post_array)->number_of_posts - 1; i >= 0; i--) {
-		if ((*post_array)->posts[i]->root->user_id == get_user_id(name)) {
-			node_posts_t *root = (*post_array)->posts[i]->root;
-			printf("%s: %s\n", get_user_name(root->user_id), root->title);
-			feed_size--;
-		} else {
-			node_posts_t *root = (*post_array)->posts[i]->root;
-			if (check_if_friend(relations, get_user_id(name), root->user_id)) {
+		node_posts_t *root = (*post_array)->posts[i]->root;
+		if (check_if_friend(relations, get_user_id(name), root->user_id)) {
 				printf("%s: %s\n", get_user_name(root->user_id), root->title);
 				feed_size--;
 			}
-		}
 	}
 }
 
@@ -77,7 +54,6 @@ void view_profile(post_array_t **post_array,char *name)
 		if((*post_array)->posts[i]->root->user_id == get_user_id(name)) {
 			node_posts_t *root = (*post_array)->posts[i]->root;
 			printf("Posted: %s\n", root->title);
-			print_node_by_user_id(root, root, get_user_id(name));
 		}
 	}
 	for (int i = 0; i < (*post_array)->number_of_posts; i++) {
