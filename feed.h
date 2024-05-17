@@ -9,8 +9,6 @@
  *
  * Please add any necessary parameters to the functions
 */
-
-
 void handle_input_feed(char *input, post_array_t **posts, int ***relations);
 
 #endif // FEED_H
