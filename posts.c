@@ -41,7 +41,7 @@ node_posts_t *create_post_node(char *name, char *title,
 	return new_post;
 }
 
-post_tree_t *create_post_tree()
+post_tree_t *create_post_tree(void)
 {
 	post_tree_t *new_tree = malloc(sizeof(post_tree_t));
 	DIE(!new_tree, "new_tree malloc");
@@ -55,17 +55,16 @@ post_array_t **create_post(post_array_t **tree_of_posts,
 	(*tree_of_posts)->number_of_posts++;
 	(*tree_of_posts)->total_posts++;
 	int num_posts = (*tree_of_posts)->number_of_posts;
-	if (num_posts == 1) {
+	if (num_posts == 1) { // Init first tree
 		(*tree_of_posts)->posts = malloc(1 * sizeof(post_tree_t *));
 		DIE(!(*tree_of_posts)->posts, "tree_of_posts->posts malloc");
-	} else {
+	} else { // Realloc tree array
 		post_tree_t **bigger_tree = realloc((*tree_of_posts)->posts,
 		(num_posts) * sizeof(post_tree_t *));
 		DIE(!bigger_tree, "bigger_tree malloc");
 		(*tree_of_posts)->posts = bigger_tree;
 	}
-	(*tree_of_posts)->posts[num_posts - 1] =
-	create_post_tree();
+	(*tree_of_posts)->posts[num_posts - 1] = create_post_tree();
 	(*tree_of_posts)->posts[num_posts - 1]->root =
 	create_post_node(name, title, (*tree_of_posts)->total_posts, 0, -1);
 	printf("Created %s for %s\n",
@@ -106,27 +105,17 @@ node_posts_t *find_node_by_id(node_posts_t *root, int post_id)
 void repost_repost(post_array_t **tree_of_posts,
 				   char *name, int post_id, int repost_id)
 {
-	int ok = 0;
-	int pok = 0;
 	int new_post_id = 0;
 	for (int i = 0; i < (*tree_of_posts)->number_of_posts; i++) {
 		if ((*tree_of_posts)->posts[i]->root->post_id == post_id) {
 			node_posts_t *root = (*tree_of_posts)->posts[i]->root;
 			node_posts_t *found = find_node_by_id(root, repost_id);
-			if (found) {
-				new_post_id = ++(*tree_of_posts)->total_posts;
-				found->children[found->children_number] =
-				create_post_node(name, NULL, new_post_id, 1, found->post_id);
-				found->children_number++;
-				ok = 1;
-			} else {
-				printf("Repost %d not found\n", repost_id);
-				pok = 1;
-			}
-			if (ok == 1)
-				break;
-			if (pok == 1)
-				return;
+
+			new_post_id = ++(*tree_of_posts)->total_posts;
+			found->children[found->children_number] =
+			create_post_node(name, NULL, new_post_id, 1, found->post_id);
+			found->children_number++;
+			break;
 		}
 	}
 	printf("Created repost #%d for %s\n", new_post_id, name);
@@ -184,7 +173,6 @@ void common_repost(post_array_t **post_array, int post_id,
 
 void like_post(post_array_t **post_array, char *name, int post_id)
 {
-	int ok = 0;
 	for (int i = 0; i < (*post_array)->number_of_posts; i++) {
 		if ((*post_array)->posts[i]->root->post_id == post_id) {
 			node_posts_t *root = (*post_array)->posts[i]->root;
@@ -192,15 +180,12 @@ void like_post(post_array_t **post_array, char *name, int post_id)
 				printf("User %s unliked post %s\n", name, root->title);
 				root->like_list[get_user_id(name)] = 0;
 				root->likes--;
-				ok = 1;
 			} else {
 				printf("User %s liked post %s\n", name, root->title);
 				root->like_list[get_user_id(name)] = 1;
 				root->likes++;
-				ok = 1;
 			}
-			if (ok == 1)
-				return;
+			return;
 		}
 	}
 }
@@ -208,29 +193,20 @@ void like_post(post_array_t **post_array, char *name, int post_id)
 void like_repost(post_array_t **post_array, char *name,
 				 int post_id, int repost_id)
 {
-	int ok = 0;
 	for (int i = 0; i < (*post_array)->number_of_posts; i++) {
 		if ((*post_array)->posts[i]->root->post_id == post_id) {
 			node_posts_t *root = (*post_array)->posts[i]->root;
 			node_posts_t *found = find_node_by_id(root, repost_id);
-			if (found) {
-				if (found->like_list[get_user_id(name)] == 1) {
-					printf("User %s unliked repost %s\n", name, root->title);
-					found->like_list[get_user_id(name)] = 0;
-					found->likes--;
-					ok = 1;
-				} else {
-					printf("User %s liked repost %s\n", name, root->title);
-					found->like_list[get_user_id(name)] = 1;
-					found->likes++;
-					ok = 1;
-				}
-				if (ok == 1)
-					return;
+			if (found->like_list[get_user_id(name)] == 1) {
+				printf("User %s unliked repost %s\n", name, root->title);
+				found->like_list[get_user_id(name)] = 0;
+				found->likes--;
 			} else {
-				printf("Repost %d not found\n", repost_id);
-				return;
+				printf("User %s liked repost %s\n", name, root->title);
+				found->like_list[get_user_id(name)] = 1;
+				found->likes++;
 			}
+			return;
 		}
 	}
 }
@@ -298,22 +274,14 @@ void delete_post(post_array_t **post_array, int post_id)
 
 void delete_repost(post_array_t **post_array, int post_id, int repost_id)
 {
-	int ok = 0;
 	for (int i = 0; i < (*post_array)->number_of_posts; i++) {
 		if ((*post_array)->posts[i]->root->post_id == post_id) {
 			node_posts_t *root = (*post_array)->posts[i]->root;
 			node_posts_t *found = find_node_by_id(root, repost_id);
-			if (found) {
-				printf("Deleted repost #%d of post %s\n",
-					   found->post_id, root->title);
-				found->post_id = -1;
-				ok = 1;
-			} else {
-				printf("Repost %d not found\n", repost_id);
-				ok = 1;
-			}
-			if (ok == 1)
-				return;
+			printf("Deleted repost #%d of post %s\n",
+				   found->post_id, root->title);
+			found->post_id = -1;
+			return;
 		}
 	}
 }
@@ -384,16 +352,13 @@ void free_post_array(post_array_t **post_array)
 		free((*post_array)->posts);
 }
 
-void verify_cmd(char *cmd) {
-	if (!cmd)
-		return;
-}
-
 void handle_input_posts(char *input, post_array_t **post_array)
 {
 	char *commands = strdup(input);
 	char *cmd = strtok(commands, "\n ");
-	verify_cmd(cmd);
+	if (!cmd)
+		return;
+
 	if (!strcmp(cmd, "create")) {
 		char *name = strtok(NULL, " ");
 		char *title = malloc(300 * sizeof(char));
@@ -416,13 +381,10 @@ void handle_input_posts(char *input, post_array_t **post_array)
 			repost_repost(post_array, name, post_id, repost_id);
 		}
 	} else if (!strcmp(cmd, "common-repost")) {
-		char *post_id_str = strtok(NULL, " ");
-		int post_id = atoi(post_id_str);
-		char *repost_id_1_str = strtok(NULL, " ");
-		int repost_id_1 = atoi(repost_id_1_str);
-		char *repost_id_2_str = strtok(NULL, " ");
-		int repost_id_2 = atoi(repost_id_2_str);
-		common_repost(post_array, post_id, repost_id_1, repost_id_2);
+		char *aux = strtok(NULL, "\n");
+		int post_id, repost_id_1, repost_id_2;
+		if (sscanf(aux, "%d %d %d", &post_id, &repost_id_1, &repost_id_2) == 3)
+			common_repost(post_array, post_id, repost_id_1, repost_id_2);
 	} else if (!strcmp(cmd, "like")) {
 		char *name = strtok(NULL, " ");
 		char *post_id_str = strtok(NULL, " ");
