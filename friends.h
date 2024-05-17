@@ -4,11 +4,6 @@
 #define MAX_COMMAND_LEN 500
 #define MAX_PEOPLE 550
 
-/**
- * Function that handles the calling of every command from task 1
- *
- * Please add any necessary parameters to the functions
-*/
 void add_friend(int ***relations, char *user1, char *user2);
 
 void remove_friend(int ***relations, char *user1, char *user2);
