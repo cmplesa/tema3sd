@@ -45,8 +45,8 @@ ei, si se retine numarul maxim de like-uri. Daca id-ul postarii cu numarul
 maxim de like-uri este cea originala se afiseaza mesajul dorit, altfel ea a
 fost "ratio'd", si se afiseaza asta.
 - Comanda delete in fuctie de caz face astfel: daca se da delete la o postare,
- se elimina tot arborele din array, si i se da free, iar daca se da delete la un
-repost, i se trece id-ul pe -1 intrucat el va fi eliberat la finalizare(daca
+ se elimina tot arborele din array, si i se da free, iar daca se da delete la
+un repost, i se trece id-ul pe -1 intrucat el va fi eliberat la finalizare(daca
 id-ul unui nod este pe -1, toate celalte comenzi il vor ignora pe el si
 descendentii lui).
 - Afisare like-urilor cauta postarea si printeaza numarul de like-uri din
