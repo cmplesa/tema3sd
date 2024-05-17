@@ -39,7 +39,7 @@ void sort_names(char ***names, int names_number)
 void uniqe_names(char ***names, int *names_number)
 {
 	for (int i = 0; i < (*names_number) - 1; i++) {
-		// daca se repeta se shifteaza toti o poz la stanga
+		// Daca se repeta se shifteaza toti o pozitie la stanga
 		while (strcmp((*names)[i], (*names)[i + 1]) == 0 &&
 			   i != (*names_number - 1)) {
 			for (int j = i; j < (*names_number) - 1; j++)
@@ -54,7 +54,7 @@ void print_suggestions(int **relations, char *user)
 	int id = (int)get_user_id(user);
 	char **suggestions = malloc(MAX_PEOPLE * sizeof(char *));
 	int suggestions_number = 0;
-	for (int i = 0; i < MAX_PEOPLE; i++) {
+	for (int i = 0; i < MAX_PEOPLE; i++) { // Salvez toate sugestiile
 		if (relations[id][i] == 1) {
 			for (int j = 0; j < MAX_PEOPLE; j++) {
 				if (relations[i][j] == 1 && relations[id][j] == 0 && j != id) {
@@ -89,14 +89,13 @@ void print_distance(int **relations, char *user1, char *user2) // BFS
 	int *distance = calloc(MAX_PEOPLE, sizeof(int));
 	int print_idx = 0;
 	int write_idx = 0;
-	queue[write_idx] = id1;
+	queue[write_idx] = id1; // Enqueue id1
 	visited[id1] = 1;
 	while (print_idx <= write_idx) {
-		int curr = queue[print_idx];
-		print_idx++;
+		int curr = queue[print_idx++]; // Dequeue
 		for (int i = 0; i < MAX_PEOPLE; i++) {
 			if (relations[curr][i] == 1 && visited[i] == 0) {
-				queue[++write_idx] = i;
+				queue[++write_idx] = i; // Enqueue i
 				visited[i] = 1;
 				distance[i] = distance[curr] + 1;
 				if (i == id2) {
@@ -122,7 +121,7 @@ void print_common_friends(int **relations, char *user1, char *user2)
 	int id2 = (int)get_user_id(user2);
 	char **common_friends = malloc(MAX_PEOPLE * sizeof(char *));
 	int common_number = 0;
-	for (int i = 0; i < MAX_PEOPLE; i++) {
+	for (int i = 0; i < MAX_PEOPLE; i++) { // Salvez toti prietenii comuni
 		if (relations[id1][i] == 1 && relations[id2][i] == 1) {
 			common_friends[common_number] = get_user_name(i);
 			common_number++;
@@ -164,7 +163,7 @@ void print_popular(int **relations, char *user)
 			for (int j = 0; j < MAX_PEOPLE; j++)
 				if (relations[i][j] == 1)
 					friends_number++;
-			if (friends_number > max_friends) {
+			if (friends_number > max_friends) { // Caut cei mai multi prieteni
 				max_friends = friends_number;
 				popular_id = i;
 			}
