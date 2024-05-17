@@ -1,17 +1,11 @@
 #ifndef POSTS_H
 #define POSTS_H
 #include <stdint.h>
-/**
- * Function that handles the calling of every command from task 2
- *
- * Please add any necessary parameters to the functions
-*/
 
 typedef struct node_posts_t node_posts_t;
 struct  node_posts_t {
 	node_posts_t **children;
 	int parent_id;
-	/* data contained by the node */
 	int likes;
 	uint16_t user_id;
 	char *title;
@@ -22,7 +16,6 @@ struct  node_posts_t {
 
 typedef struct post_tree_t post_tree_t;
 struct post_tree_t {
-	/* root of the tree */
 	node_posts_t  *root;
 };
 
