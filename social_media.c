@@ -1,6 +1,3 @@
-/**
- * The entrypoint of the homework. Every initialization must be done here
-*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -10,9 +7,6 @@
 #include "posts.h"
 #include "feed.h"
 
-/**
- * Initializez every task based on which task we are running
-*/
 void init_tasks(void)
 {
 	#ifdef TASK_1
@@ -28,9 +22,6 @@ void init_tasks(void)
 	#endif
 }
 
-/**
- * Entrypoint of the program, compiled with different defines for each task
-*/
 int main(void)
 {
 	init_users();
@@ -39,6 +30,7 @@ int main(void)
 
 	char *input = (char *)malloc(MAX_COMMAND_LEN);
 
+	// Init relations matrix
 	int **relations = malloc(MAX_PEOPLE * sizeof(int *));
 	for (int i = 0; i < MAX_PEOPLE; i++) {
 		relations[i] = malloc(MAX_PEOPLE * sizeof(int));
@@ -46,6 +38,7 @@ int main(void)
 			relations[i][j] = 0;
 	}
 
+	// Init posts array
 	post_array_t *posts = malloc(sizeof(post_array_t));
 	posts->number_of_posts = 0;
 	posts->total_posts = 0;
@@ -53,7 +46,6 @@ int main(void)
 	while (1) {
 		char *command = fgets(input, MAX_COMMAND_LEN, stdin);
 
-		// If fgets returns null, we reached EOF
 		if (!command)
 			break;
 
@@ -70,11 +62,12 @@ int main(void)
 		#endif
 	}
 
+	// Free relations matrix
 	for (int i = 0; i < MAX_PEOPLE; i++)
 		free(relations[i]);
-
 	free(relations);
 
+	// Free posts array
 	#ifdef TASK_2
 	free_post_array(&posts);
 	#endif
