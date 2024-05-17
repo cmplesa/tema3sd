@@ -42,9 +42,8 @@ int main(void)
 	int **relations = malloc(MAX_PEOPLE * sizeof(int *));
 	for (int i = 0; i < MAX_PEOPLE; i++) {
 		relations[i] = malloc(MAX_PEOPLE * sizeof(int));
-		for (int j = 0; j < MAX_PEOPLE; j++) {
+		for (int j = 0; j < MAX_PEOPLE; j++)
 			relations[i][j] = 0;
-		}
 	}
 
 	post_array_t *posts = malloc(sizeof(post_array_t));
@@ -71,9 +70,9 @@ int main(void)
 		#endif
 	}
 
-	for (int i = 0; i < MAX_PEOPLE; i++) {
+	for (int i = 0; i < MAX_PEOPLE; i++)
 		free(relations[i]);
-	}
+
 	free(relations);
 
 	#ifdef TASK_2
